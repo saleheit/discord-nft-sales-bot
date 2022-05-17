@@ -24,7 +24,6 @@ export type MetadataCb = (metadata: any) => {
 };
 
 type Options = {
-  metadataCb?: MetadataCb;
   websocketURI: string;
   contractAddress: string;
   discordBotToken: string;
@@ -90,12 +89,12 @@ async function nftSalesBot(options: Options) {
       const uri = await contract.methods
         .tokenURI(res.returnValues.tokenId)
         .call();
-      const metadata = await fetchMetadata(
-        options.metadataCb ?? ((m: any) => m)
-      )(uri);
       const block = await web3.eth.getBlock(res.blockNumber);
       const message = createMessage(
-        metadata,
+        {
+          name: "SHINY", 
+          image: "https://shiny-nft.com/assets/images/logo.svg"
+        },
         value.toFixed(),
         res.returnValues.to,
         res.returnValues.from,
