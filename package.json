@@ -19,6 +19,8 @@
   },
   "scripts": {
     "build": "tsc",
+    "start": "node dist/serve",
+    "go": "npm run build && npm run start",
     "prepare": "yarn build"
   },
   "engines": {
