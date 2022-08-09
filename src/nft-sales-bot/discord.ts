@@ -28,7 +28,7 @@ export const createMessage = (
 ) =>
 	new Discord.MessageEmbed()
 		.setColor("#AFBEF6")
-		.setTitle(`${metadata.name} sold!`)
+		.setTitle(`${metadata.name} adopted!`)
 		.setAuthor(
 			"Shiny NFT",
 			"https://i.imgur.com/reaFWsR.png",
@@ -38,7 +38,7 @@ export const createMessage = (
 			{ name: "Name", value: metadata.name, inline: true },
 			{ name: "Amount", value: `${value} Ξ`, inline: true },
 			{
-				name: "Sold at",
+				name: "Adopted at",
 				value: format(
 					new Date(parseInt(timestamp as string) * 1000),
 					"MMM do y h:mm a"
