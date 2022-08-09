@@ -1,9 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 import abi from "./erc721abi.json";
 import BN from "bignumber.js";
 import { createMessage, discordSetup } from "./discord";
 import debug from "debug";
+import axios from "axios";
 
 const log = debug("DISCORD_BOT");
 
@@ -69,7 +72,7 @@ async function nftSalesBot(options: Options) {
 		);
 		let wethValue = new BN(0);
 		log(txReceipt.logs);
-		txReceipt?.logs.forEach((currentLog) => {
+		txReceipt?.logs.forEach((currentLog: any) => {
 			// check if WETH was transferred during this transaction
 			if (
 				currentLog.topics[2]?.toLowerCase() ==
@@ -92,13 +95,14 @@ async function nftSalesBot(options: Options) {
 		value = value.gt(0) ? value : wethValue;
 		if (value.gt(0)) {
 			const uri = await contract.methods
-				.tokenURI(res.returnValues.tokenId)
+				.uri(res.returnValues.tokenId)
 				.call();
+			const { data } = await axios.get(uri);
 			const block = await web3.eth.getBlock(res.blockNumber);
 			const message = createMessage(
 				{
-					name: "Goddess",
-					image: "https://i.imgur.com/reaFWsR.png",
+					name: data.name,
+					image: data.image,
 				},
 				value.toFixed(),
 				res.returnValues.to,
@@ -117,7 +121,7 @@ async function nftSalesBot(options: Options) {
 	}
 
 	log("Adding contract event listener");
-	contract.events.Transfer(async (err: any, res: TransferEvent) => {
+	contract.events.TransferSingle(async (err: any, res: TransferEvent) => {
 		if (!err) {
 			await transferCallback(res);
 		}

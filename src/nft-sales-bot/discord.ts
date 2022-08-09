@@ -48,7 +48,5 @@ export const createMessage = (
 			{ name: "Buyer", value: buyer },
 			{ name: "Seller", value: seller }
 		)
-		.setURL(`https://opensea.io/assets/${contractAddress}/${tokenId}`)
-		.setThumbnail(
-			`https://everyday-goddesses.mypinata.cloud/ipfs/QmVWyCLkiBVKgFdaMD9aXy27uz5sip4EwTWSQx3Hb8XT8v/${tokenId}.png`
-		);
+		.setURL(metadata.image)
+		.setThumbnail(metadata.image);
