@@ -93,9 +93,6 @@ async function nftSalesBot(options: Options) {
 		);
 		value = value.gt(0) ? value : wethValue;
 		if (value.gt(0)) {
-			const uri = await contract.methods
-				.tokenURI(res.returnValues.tokenId)
-				.call();
 			const block = await web3.eth.getBlock(res.blockNumber);
 			const message = createMessage(
 				{
@@ -121,7 +118,7 @@ async function nftSalesBot(options: Options) {
 			try {
 				await tweet({
 					tokenId: res.returnValues.tokenId,
-					contractId: options.contractAddress,
+					contractAddress: options.contractAddress,
 					buyer: res.returnValues.to,
 					seller: res.returnValues.from,
 					timestamp: block.timestamp,

@@ -11,9 +11,13 @@ export const tweet = (tweetBd: any) => {
 		});
 
 		try {
-			const { data } = await axios.get(tweetBd.image, {
-				responseType: "arraybuffer",
-			});
+			const tokenId = tweetBd.tokenId > 2222 ? 196 : tweetBd.tokenId;
+			const { data } = await axios.get(
+				`https://everyday-goddesses.mypinata.cloud/ipfs/QmVWyCLkiBVKgFdaMD9aXy27uz5sip4EwTWSQx3Hb8XT8v/${tokenId}.png`,
+				{
+					responseType: "arraybuffer",
+				}
+			);
 			const imageBuffer = Buffer.from(data);
 
 			const mediaId = await client.v1.uploadMedia(imageBuffer, {
@@ -22,16 +26,19 @@ export const tweet = (tweetBd: any) => {
 
 			await client.v2.tweetThread([
 				{
-					text: `Everyday Goddess # ${
+					text: `Everyday Goddess #${
 						tweetBd.tokenId
 					} was adopted for ${
 						tweetBd.value
-					} by ${tweetBd.seller.substring(
+					}Ξ by ${tweetBd.seller.substring(
+						0,
 						7
-					)} from ${tweetBd.buyer.substring(7)}`,
+					)} from ${tweetBd.buyer.substring(0, 7)}`,
 					media: { media_ids: [mediaId] },
 				},
-				`https://opensea.io/assets/${tweetBd.contractAddress}/${tweetBd.tokenId}`,
+				{
+					text: `https://opensea.io/assets/${tweetBd.contractAddress}/${tweetBd.tokenId}`,
+				},
 			]);
 
 			resolve(1);
