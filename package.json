@@ -8,14 +8,17 @@
   "author": "nftboi <ethnftboi@protonmail.com>",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.27.2",
     "bignumber.js": "^9.0.1",
     "date-fns": "^2.25.0",
     "debug": "^4.3.2",
     "discord.js": "^13.2.0",
     "dotenv": "^16.0.1",
     "node-fetch": "^2.6.1",
+    "twitter-api-v2": "^1.12.3",
     "typescript": "^4.4.3",
-    "web3": "^1.6.0"
+    "web3": "^1.6.0",
+    "winston": "^3.8.1"
   },
   "scripts": {
     "build": "tsc",
@@ -30,6 +33,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.7",
     "@types/node-fetch": "^2.5.12",
+    "@types/request": "^2.48.8",
     "web3-core": "^1.6.0",
     "web3-utils": "^1.6.0"
   }

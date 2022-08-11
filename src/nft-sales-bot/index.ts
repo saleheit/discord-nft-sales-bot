@@ -2,8 +2,10 @@ import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 import abi from "./erc721abi.json";
 import BN from "bignumber.js";
+import { tweet } from "./twitter";
 import { createMessage, discordSetup } from "./discord";
 import debug from "debug";
+import Logger from "./logger";
 
 const log = debug("DISCORD_BOT");
 
@@ -111,7 +113,24 @@ async function nftSalesBot(options: Options) {
 			try {
 				await channel.send({ embeds: [message] });
 			} catch (e: any) {
-				console.log("Error sending message", " ", e.message);
+				Logger.error(
+					`Error: Failed sending disord message ${e.message}`
+				);
+			}
+
+			try {
+				await tweet({
+					tokenId: res.returnValues.tokenId,
+					contractId: options.contractAddress,
+					buyer: res.returnValues.to,
+					seller: res.returnValues.from,
+					timestamp: block.timestamp,
+					value: value.toFixed(),
+				});
+			} catch (e: any) {
+				Logger.error(
+					`Error: Failed sending twitter message ${e.message}`
+				);
 			}
 		}
 	}
