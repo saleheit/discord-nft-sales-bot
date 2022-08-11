@@ -7,8 +7,7 @@ import BN from "bignumber.js";
 import { createMessage, discordSetup } from "./discord";
 import debug from "debug";
 import axios from "axios";
-
-const log = debug("DISCORD_BOT");
+import Logger from "./logger";
 
 type TransferEvent = {
 	returnValues: {
@@ -35,13 +34,12 @@ type Options = {
 const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase();
 
 async function nftSalesBot(options: Options) {
-	log("Setting up discord bot");
+	Logger.info("INFO: BOT init started");
 	const channel = await discordSetup(
 		options.discordBotToken,
 		options.discordChannelId
 	);
-	log("Setting up discord bot complete");
-
+	Logger.info("INFO: BOT init complete");
 	const web3 = new Web3(
 		new Web3.providers.WebsocketProvider(options.websocketURI, {
 			clientConfig: {
@@ -63,15 +61,16 @@ async function nftSalesBot(options: Options) {
 	);
 
 	async function transferCallback(res: TransferEvent) {
-		log("Transfer event received.");
-		log("Getting transaction");
+		Logger.info("INFO: Transfer Event Recieved");
 		const tx = await web3.eth.getTransaction(res.transactionHash);
-		log("Getting transaction receipt");
+		Logger.info("INFO: BOT started");
+
 		const txReceipt = await web3.eth.getTransactionReceipt(
 			res.transactionHash
 		);
 		let wethValue = new BN(0);
-		log(txReceipt.logs);
+		Logger.info(`INFO: tx.recipet ${JSON.stringify(txReceipt)}`);
+
 		txReceipt?.logs.forEach((currentLog: any) => {
 			// check if WETH was transferred during this transaction
 			if (
@@ -84,20 +83,23 @@ async function nftSalesBot(options: Options) {
 					"0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef".toLowerCase()
 			) {
 				const v = `${parseInt(currentLog.data)}`;
-				log(`Weth value found ${v}`);
+				Logger.info(`INFO: Weth value found ${v}`);
 				wethValue = wethValue.plus(web3.utils.fromWei(v));
 			}
 		});
 		let value = new BN(web3.utils.fromWei(tx.value));
-		log(
-			`WETH Value: ${wethValue.toFixed()}, ETH Value: ${value.toFixed()}`
+		Logger.info(
+			`INFO: WETH Value: ${wethValue.toFixed()}, ETH Value: ${value.toFixed()}`
 		);
-		value = value.gt(0) ? value : wethValue;
-		if (value.gt(0)) {
+
+		value = value != undefined && value.gt(0) ? value : wethValue;
+		if (value != undefined && value.gt(0)) {
 			const uri = await contract.methods
 				.uri(res.returnValues.tokenId)
 				.call();
+			Logger.info(`INFO: URI is ${uri}}`);
 			const { data } = await axios.get(uri);
+			Logger.info(`INFO: Data ${data.name} - ${data.image}}`);
 			const block = await web3.eth.getBlock(res.blockNumber);
 			const message = createMessage(
 				{
@@ -111,16 +113,17 @@ async function nftSalesBot(options: Options) {
 				options.contractAddress,
 				res.returnValues.tokenId
 			);
-			log("Try sending message");
+
 			try {
 				await channel.send({ embeds: [message] });
 			} catch (e: any) {
-				console.log("Error sending message", " ", e.message);
+				Logger.error(
+					`ERROR Index-116: Error sending message ${e.message}`
+				);
 			}
 		}
 	}
 
-	log("Adding contract event listener");
 	contract.events.TransferSingle(async (err: any, res: TransferEvent) => {
 		if (!err) {
 			await transferCallback(res);
