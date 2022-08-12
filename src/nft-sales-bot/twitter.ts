@@ -24,22 +24,17 @@ export const tweet = (tweetBd: any) => {
 				mimeType: "Png",
 			});
 
-			await client.v2.tweetThread([
-				{
-					text: `Everyday Goddess #${
-						tweetBd.tokenId
-					} was adopted for ${
-						tweetBd.value
-					}Ξ by ${tweetBd.seller.substring(
-						0,
-						7
-					)} from ${tweetBd.buyer.substring(0, 7)}`,
-					media: { media_ids: [mediaId] },
-				},
-				{
-					text: `https://opensea.io/assets/${tweetBd.contractAddress}/${tweetBd.tokenId}`,
-				},
-			]);
+			await client.v2.tweet({
+				text: `Everyday Goddess #${tweetBd.tokenId} was adopted for ${
+					tweetBd.value
+				}Ξ by ${tweetBd.seller.substring(
+					0,
+					7
+				)} from ${tweetBd.buyer.substring(0, 7)}
+					
+					➡ https://opensea.io/assets/${tweetBd.contractAddress}/${tweetBd.tokenId} `,
+				media: { media_ids: [mediaId] },
+			});
 
 			resolve(1);
 		} catch (e: any) {
