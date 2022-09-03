@@ -1,11 +1,8 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 import abi from "./erc721abi.json";
 import BN from "bignumber.js";
 import { createMessage, discordSetup } from "./discord";
-import debug from "debug";
 import axios from "axios";
 import Logger from "./logger";
 
@@ -63,6 +60,8 @@ async function nftSalesBot(options: Options) {
 	async function transferCallback(res: TransferEvent) {
 		Logger.info("INFO: Transfer Event Recieved");
 		const tx = await web3.eth.getTransaction(res.transactionHash);
+		Logger.info(`INFO: tx ${JSON.stringify(tx)}`);
+
 		Logger.info("INFO: BOT started");
 
 		const txReceipt = await web3.eth.getTransactionReceipt(
@@ -92,8 +91,8 @@ async function nftSalesBot(options: Options) {
 			`INFO: WETH Value: ${wethValue.toFixed()}, ETH Value: ${value.toFixed()}`
 		);
 
-		value = value != undefined && value.gt(0) ? value : wethValue;
-		if (value != undefined && value.gt(0)) {
+		value = value.gt(0) ? value : wethValue;
+		if (value.gt(0)) {
 			const uri = await contract.methods
 				.uri(res.returnValues.tokenId)
 				.call();
@@ -117,7 +116,7 @@ async function nftSalesBot(options: Options) {
 			try {
 				await channel.send({ embeds: [message] });
 			} catch (e: any) {
-				Logger.error(
+				Logger.info(
 					`ERROR Index-116: Error sending message ${e.message}`
 				);
 			}
@@ -126,6 +125,7 @@ async function nftSalesBot(options: Options) {
 
 	contract.events.TransferSingle(async (err: any, res: TransferEvent) => {
 		if (!err) {
+			Logger.info(`INFO: TransferEven ${JSON.stringify(res)}`);
 			await transferCallback(res);
 		}
 	});

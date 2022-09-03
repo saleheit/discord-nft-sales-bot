@@ -14,5 +14,5 @@ nftSalesBot({
 	discordChannelId: process.env.DISCORD_CHANNEL_ID ?? "",
 }).catch((e) => {
 	// something went wrong
-	Logger.error(`ERROR Serve-17: Error sending message ${e.message}`);
+	Logger.info(`ERROR Serve-17: Error sending message ${e.message}`);
 });
